@@ -1,0 +1,126 @@
+local CL = Instance.new("ScreenGui")
+local CLF = Instance.new("Frame")
+local CLFB = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local SFCL = Instance.new("ScrollingFrame")
+local UIListLayout = Instance.new("UIListLayout")
+local UIPadding = Instance.new("UIPadding")
+local UIS = game:GetService("UserInputService")
+local dragSpeed = -math.huge
+
+local dragToggle = nil
+local dragInput = nil
+local dragStart = nil
+local dragPos = nil
+
+function dragify(Frame)
+	function updateInput(input)
+        local Delta = input.Position - dragStart
+        local Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
+        script.Parent.Position = Position
+	end
+	
+    Frame.InputBegan:Connect(function(input)
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and UIS:GetFocusedTextBox() == nil then
+            dragToggle = true
+            dragStart = input.Position
+            startPos = Frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragToggle = false
+                end
+            end)
+        end
+	end)
+	
+    Frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+	end)
+	
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if input == dragInput and dragToggle then
+            updateInput(input)
+        end
+    end)
+end
+
+CL.Name = "CL"
+CL.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+CL.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+CLF.Name = "CLF"
+CLF.Parent = CL
+CLF.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+CLF.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CLF.BorderSizePixel = 0
+CLF.Position = UDim2.new(0.317434192, 0, 0.299554557, 0)
+CLF.Size = UDim2.new(0, 443, 0, 388)
+
+CLFB.Name = "CLFB"
+CLFB.Parent = CLF
+CLFB.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CLFB.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CLFB.BorderSizePixel = 0
+CLFB.Position = UDim2.new(0, 0, 0.095360823, 0)
+CLFB.Size = UDim2.new(0, 442, 0, 3)
+
+TextLabel.Parent = CLF
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Size = UDim2.new(0, 442, 0, 37)
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.Text = "Tracks - Chatlog (Legacy)"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextSize = 30.000
+TextLabel.TextWrapped = true
+TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+SFCL.Name = "SFCL"
+SFCL.Parent = CLF
+SFCL.Active = true
+SFCL.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+SFCL.BackgroundTransparency = 1.000
+SFCL.BorderColor3 = Color3.fromRGB(0, 0, 0)
+SFCL.BorderSizePixel = 0
+SFCL.Position = UDim2.new(0, 0, 0.095360823, 0)
+SFCL.Size = UDim2.new(0, 442, 0, 351)
+SFCL.BottomImage = ""
+SFCL.MidImage = ""
+SFCL.TopImage = ""
+
+UIListLayout.Parent = SFCL
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 1)
+
+UIPadding.Parent = SFCL
+
+local function createlabel(Instance1)
+local TextLabel = Instance.new("TextLabel")
+
+TextLabel.Parent = game.StarterGui.CL.CLF.SFCL
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0, 0, 0.0180412363, 0)
+TextLabel.Size = UDim2.new(0, 200, 0, 50)
+TextLabel.Text = Instance1
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 14.000
+TextLabel.TextWrapped = true
+end
+
+local plr = game.Players.LocalPlayer
+
+plr.Chatted:Connect(function(Message)
+		if logsEnabled == true then
+			CreateLabel(plr.Name,Message)
+		end
+
+dragify(CLF)
